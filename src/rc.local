@@ -1,0 +1,37 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+# WIFI
+echo 191 > /sys/class/gpio/export;
+echo out > /sys/class/gpio/gpio191/direction;
+echo 1 > /sys/class/gpio/gpio191/value;
+modprobe -r iwlwifi;
+modprobe iwlwifi;
+# RELAYS
+echo 165 > /sys/class/gpio/export; #Enable GPIO 165 = PIN 55 = LEDS
+echo out > /sys/class/gpio/gpio165/direction;        #GPIO 165 OUT
+echo 166 > /sys/class/gpio/export; #Enable GPIO 166 = PIN 58 = LASER
+echo out > /sys/class/gpio/gpio166/direction;        #GPIO 166 OUT
+sleep 0.2;
+echo 0 > /sys/class/gpio/gpio165/value; #GPIO 165 LOW
+echo 0 > /sys/class/gpio/gpio166/value; #GPIO 166 LOW
+# Set CPU to full performance
+echo 0 > /sys/devices/system/cpu/cpuquiet/tegra_cpuquiet/enable;
+echo 1 > /sys/devices/system/cpu/cpu0/online;
+echo 1 > /sys/devices/system/cpu/cpu1/online;
+echo 1 > /sys/devices/system/cpu/cpu2/online;
+echo 1 > /sys/devices/system/cpu/cpu3/online;
+echo performance > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor;
+# Clock the GPUs to max speed
+echo 852000000 > /sys/kernel/debug/clock/override.gbus/rate
+echo 1 > /sys/kernel/debug/clock/override.gbus/state
+exit 0
