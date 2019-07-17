@@ -1,42 +1,50 @@
 # Alpha ROVER
-A repository for a 6-wheel rocker bogie rover, based on Robotic Operative System ROS and python to control its perception and action systems.
+A repository for a 6-wheel rocker bogie rover, based on Robotic Operative System ROS and Python to control the perception and action systems.
 
 This repository contents: 
 - Source codes 
 - Dev scripts
+- Data files
 
 ```
 /your_root        - path
 |--Readme      			 / Instructions to use the AlphaROVER
 |--src         			 / scripts for the system
-  |--roboclaw_node       /scripts to launch the control of the system
-	  |--src        
-	  |--config            
-	  |--launch with hierarchical scheme
-	  |--nodes
-	  |--CMakeLists.txt
-	  |--LICENCE.md
-	  |--package.xml
-	  |--README.md
-  |--arm.py
-  |--maestro.py
-  |--com.py
-  |--control_mode.py
-  |--ipmailer.py
-  |--laser_on.py
-  |--leds_on.py
-  |--lights_off.py
-  |--manual_mode.py
-  |--rc.local
+  |--alpha_pc            / scripts to launch the control of the system
+	  |--arm.py
+	  |--maestro.py
+	  |--com.py
+	  |--control_mode.py
+	  |--ekf.py
+	  |--ipmailer.py
+	  |--laser_on.py
+	  |--leds_on.py
+	  |--lights_off.py
+	  |--manual_mode.py
+	  |--rc.local
+	  |--roboclaw_ros	/ modified from: https://github.com/sonyccd/roboclaw_ros.git
+		  |--LICENCE.md
+		  |--README.md
+		  |--roboclaw_node
+  |--user_pc
+	  |--cam_bridge.py
+|--data
+	|--mechanics  
+		|--alpha_full.pdf
+		|--inventor_files
+		|--photos
+	|--electronics 
+		|--diagrams
+		|--proteus_files      			 
 ```
 
 ## Hardware Requirements:
-- Nvidia Jetson TK1
+- Nvidia Jetson TK1 or PC with Linux
 - Ion Motion Roboclaw, Dual DC motor driver
 - Pololu USB servo Control [POL-1353]
 - Logitech Wireless Gamepad F710 
 - PC host running Ubuntu
-- AlphaROVER Robot
+- AlphaROVER platform
 
 ## Software Requirements:
 - ROS [Kinetic][kin] for Ubuntu 16.04 or ROS [Indigo][ind] for Ubuntu 14.04 on user PC . 
@@ -44,6 +52,7 @@ This repository contents:
 - RVIZ from ROS
 - ROS [Indigo][ind-j] for Ubuntu 14.04 (armhf) on Jetson TK1
 - OpenCV
+- Modified node *xsens_mti_ros_node* available [here.](https://github.com/HaroldMurcia/xsens_mti_ros_node) 
 
 ## Getting Started on Jetson TK1
 The following steps describe how to configure the Jetson TK1.
@@ -130,17 +139,21 @@ And place this code on it:
 - Now open URL in web browser: {Jetson_IP}:8080
  
 #### Functions to add on Jetson's .bashrc file
+
+**Notes/** 
+* *Paths and code of roboclaw_node.py must be updated according to the pc installation.*
+* `~/AlphaROVER/src/alpha_pc/rc.local` must be located on `/etc` folder. 
+
 `nano .bashrc`
 ```
 source /opt/ros/indigo/setup.bash
 
-function control_arm {
-  sudo chmod 777 /dev/tty_pololu1
-  sudo chmod 777 /dev/tty_pololu2
-  sudo chmod 777 /dev/ttyACM1
-  python /home/rover/Desktop/Mercury/arm.py &
+function arm {
+        sudo chmod 777 /dev/tty_pololu
+        python ~/AlphaROVER/src/alpha_pc/arm.py
+        sleep 1
+        echo $"Arm OK..."
 }
-
 
 function exportar {
         export ROS_IP = {JetsonIP}
@@ -153,24 +166,19 @@ function exportar_hamachi {
         export ROS_MASTER_URI=http://{pcHamachiIP}:11311
 }
 
-#For local webcam image
+#Launch main webcam
 function webcam {
-        rosrun image_view image_view image:=/usb_cam/image_raw
-        #or:
-        #rqt_image_view
-}
-
-# For web streaming
-function webcam_server {
-        source ~/rosvid_ws/devel/setup.bash
-        roslaunch vidsrv vidsrv.launch
+	roslaunch usb_cam usb_cam-test.launch &
+        sleep 5
+        echo $"Main camera ready..."
 }
 
 function run {
-	sudo chmod 777 /dev/tty_roboclaw
-	source /home/ubuntu/rbcw_ws/devel/setup.bash
-	roslaunch roboclaw_node roboclaw.launch &
-	echo $"Run Launched"
+        sudo chmod 777 /dev/tty_roboclaw
+        source /home/ubuntu/rbcw_ws/devel/setup.bash
+        roslaunch roboclaw_node roboclaw.launch &
+        sleep 3
+        echo $"Run Launched"
 }
 
 function kinect {
@@ -178,37 +186,35 @@ function kinect {
 }
 
 function ekf {
-        source ~/loc_ws/devel/setup.bash
-        roslaunch robot_localization ekf_template.launch
+        python ~/AlphaROVER/src/alpha_pc/ekf.py
 }
 
 function imu_node {
 	sudo chmod 777 /dev/ttyUSB0
-	source /home/ubuntu/imu_ws/devel/setup.bash
+	source /home/ubuntu/xsens_ws/devel/setup.bash
 	roslaunch xsens_driver xsens.launch
 }
+
 
 # Main function
 function rover {
         roscore &
         sleep 4
         piloto &
-        run
+        echo $"Launched piloto"
+        sleep 2
+        run &
+        sleep 2
+        echo $"Ready..."
 }
 
-# Add CUDA bin & library paths:
-export PATH=/usr/local/cuda/bin:/opt/ros/indigo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
-export LD_LIBRARY_PATH=/usr/local/cuda/lib:/opt/ros/indigo/lib
-# Add CUDA bin & library paths:
-export PATH=/usr/local/cuda-6.5/bin:/usr/local/cuda/bin:/opt/ros/indigo/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
-export LD_LIBRARY_PATH=/usr/local/cuda-6.5/lib:/usr/local/cuda/lib:/opt/ros/indigo/lib
-
-sudo python /home/ubuntu/Desktop/Mercury/bash_config.py
+sudo python ~/AlphaROVER/src/alpha_pc/bash_config.py
 ```
+
 ## Getting Started on host PC
 - Install ros according to your ubuntu version, in this case Ubuntu 16.04.
 - Install hamachi and haguichi.
-#### Configuring a Linux-Supported Joystick with ROS
+### Configuring a Linux-Supported Joystick with ROS
 - Install the package:
 `sudo apt-get install ros-kinetic-joy`
 
@@ -227,7 +233,7 @@ Move the joystick around to see the data change.
 To see the data from the joystick:
 `rostopic echo joy`
 
-#### Functions to add on PC's .bashrc file
+### Functions to add on PC's .bashrc file
 ```
 source /opt/ros/kinetic/setup.bash
 
@@ -240,7 +246,8 @@ function pilot
  }
 
 # If want to connect through hamachi
-function exportar_hamachi {
+function exportar_hamachi 
+{
         export ROS_IP = {pcIP}
 }
 
@@ -249,37 +256,29 @@ function exportar
   export ROS_IP = {pcIP}
 }
 
-function arm
-{
-  rostopic echo arm_string
-}
-
-function joy_prove
-{
-  ls -l /dev/input/js1
-  sudo chmod a+rw /dev/input/js1
-
-  rosparam set joy_node/dev "/dev/input/js1"
-  rosrun joy joy_node &
-  rostopic echo joy
-}
-
-# For local Jetson webcam image, 
-# It presents more latency than the web streaming method (webcam_server)
+# To access Jetson webcam image
 function webcam
 {
-	rosrun image_view image_view image:=/usb_cam/image_raw &
-	#or:
-	#rqt_image_view
+	python ~/cam_bridge.py
 }
 ```
 
 
 
 ## Authors:
-**Universidad de Ibagué** - **Ingeniería Electrónica.**
+**[Universidad de Ibagué - Ingeniería Electrónica.](https://electronica.unibague.edu.co)**
 **Proyecto de Grado 2019/A**
 - [Nickson E. Garcia](mailto:nicksongarcia@ieee.org)
 - [Cristian G. Molina](mailto:2420132009@estudiantesunibague.edu.co) 
 - [Harold F. Murcia](www.haroldmurcia.com)
 ***
+
+[ros]: <http://www.ros.org/>
+[lib-rc]: <http://www.basicmicro.com/downloads>
+[pol]: <https://www.pololu.com/product/1353>
+[jet]: <https://developer.nvidia.com/embedded/downloads#?tx=$product,jetson_tk1$software,l4t-tk1>
+[kin]: <http://wiki.ros.org/kinetic/Installation/Ubuntu>
+[ind]: <http://wiki.ros.org/indigo/Installation/Ubuntu>
+[ind-j]: <http://wiki.ros.org/indigo/Installation/UbuntuARM>
+[ham]: <https://medium.com/@KyleARector/logmein-hamachi-on-raspberry-pi-ad2ba3619f3a>
+
