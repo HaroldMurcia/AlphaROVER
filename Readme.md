@@ -1,7 +1,7 @@
 # Alpha ROVER
 A repository for a 6-wheel rocker bogie rover, based on Robotic Operative System ROS and Python to control the perception and action systems.
 
-Watch the YouTube video [here](https://www.youtube.com/watch?v=stQqyb9inXY&t=333s)
+* Watch the YouTube video [here](https://www.youtube.com/watch?v=stQqyb9inXY&t=333s)
 
 This repository contents: 
 - Source codes 
