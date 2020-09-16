@@ -1,6 +1,11 @@
 # Alpha ROVER
 A repository for a 6-wheel rocker bogie rover, based on Robotic Operative System ROS and Python to control the perception and action systems.
 
+<p align='center'>
+    <img src="./data/mechanics/photos/Picture1.png" alt="drawing" width="800"/>
+</p>
+
+
 * Watch the YouTube video [here](https://www.youtube.com/watch?v=stQqyb9inXY&t=333s)
 * Read the document [here](https://repositorio.unibague.edu.co/jspui/bitstream/20.500.12313/1296/1/Trabajo%20de%20grado.pdf)
 
@@ -10,24 +15,16 @@ This repository contents:
 - Data files
 
 ```
-/your_root            / path
+/your_root                / path
 |--README.md     		  / Instructions to configure the AlphaROVER
 |--src         			  / scripts for the system
 	  |--APPS
 	  |--Arduinio_gps+imu
 	  |--Arm            / Based on: https://github.com/FRC4564/Maestro/
-	  |--Cam            / Based on: https://github.com/ros-drivers/usb_cam
-	  |--Camera_actuation
 	  |--Config
-	  |--dynamixel_motor/ Based on: https://github.com/arebgun/dynamixel_motor.git
+	  |--Control
 	  |--EKF
 	  |--GPIO
-	  |--Roboclaw       / Based on: https://github.com/sonyccd/roboclaw_ros
-	    |--LICENCE.md
-		|--README.md
-		|--roboclaw_node
-	  |--Vid
-	  |--X_sens         / https://github.com/sonyccd/roboclaw_ros.git
 |--data
 	|--mechanics  
 		|--alpha_full.pdf
@@ -53,90 +50,8 @@ This repository contents:
 ## Software Requirements:
 - OpenCV
 - Hamachi
-- Modified node *xsens_mti_ros_node* available [here](https://github.com/HaroldMurcia/xsens_mti_ros_node)
-- Install the MTi USB Serial Driver
-  ```
-  git clone https://github.com/xsens/xsens_mt.git
-  cd ~/xsens_mt
-  make
-  sudo modprobe usbserial
-  sudo insmod ./xsens_mt.ko
-  ```
-- Install gps_common or gps_umd as available based on the ROS distributable
-  `sudo apt-get install ros-melodic-gps-umd` or `sudo apt-get install ros-melodic-gps-common`
-- Install LiDAR
-  `sudo apt install ros-melodic-urg-node`
-- Install Joy
-  `sudo apt install ros-melodic-joy`
-- Install tf
-	`sudo apt install ros-melodic-tf`
 
 
-## Jetson TK1
-Based on [flashing](https://developer.download.nvidia.com/embedded/L4T/r21_Release_v8.0/release_files/l4t_quick_start_guide.txt?2AJGr6ik6_g9nwN5HQ5Q2Zh8DJOTP4hQvehjztkoRcC0o4x_35fPIgZ8OOStLerVgY6a37NIBN9VFDC-kZmbKVFt7QG3zCIAF565Ages-cXgJkXhkqV_fGzqVarbLOQ-JTuidCfq2qnsmdUVltVu4ifN7R8m6NfQpobz6UxapI47LlCS)
-```
-mkdir LT4
-cd LT4
-wget https://developer.nvidia.com/embedded/dlc/tk1-driver-package-r218
-wget https://developer.nvidia.com/embedded/dlc/sample-root-filesystem-r218
-sudo tar xpf Tegra124_Linux_R21.8.0_armhf.tbz2
-cd Linux_for_Tegra/rootfs
-sudo tar xpf ../../Tegra_Linux_Sample-Root-Filesystem_R21.8.0_armhf.tbz2
-cd ..
-sudo ./apply_binaries.sh
-```
-Put Jetson TK1 into “recovery mode” by holding down the RECOVERY button while pressing and releasing the RESET button once on the main board.
-```
-sudo ./flash.sh jetson-tk1 mmcblk0p1
-```
-
-### Installing USB camera on ROS Jetson TK1
-- Plug in the USB camera and check if it was recognized by system:
-`lsusb `
-`ls /dev | grep video*`
-
-- Install usb_cam ROS node:
-`sudo apt install ros-indigo-usb-cam`
-- Start usb_cam node on slave:
-`roslaunch usb_cam usb_cam-test.launch`
-- You can read camera data with image_view:
-`rosrun image_view image_view image:=/usb_cam/image_raw`
-- For web streaming install web-video-server ROS node:
-`sudo apt install ros-indigo-web-video-server`
-- Create catkin workspace:
-`mkdir -p ~/rosvid_ws/src`
-`cd ~/rosvid_ws`
-`catkin_make`
-`source devel/setup.bash`
-- Then create ROS package:
-`cd src `
-`catkin_create_pkg vidsrv std_msgs rospy roscpp `
-- Create a launch file:
-`mkdir -p vidsrv/launch`
-`nano vidsrv/launch/vidsrv.launch`
-
-And place this code on it:
-```
-<launch>
-  <!-- This node description you can take from usb_cam-test.launch -->
-  <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
-    <param name="video_device" value="/dev/video0" />
-    <param name="image_width" value="640" />
-    <param name="image_height" value="480" />
-    <param name="pixel_format" value="yuyv" />
-    <param name="camera_frame_id" value="usb_cam" />
-    <param name="io_method" value="mmap"/>
-  </node>
-  <!-- This node will launch web video server -->
-  <node name="web_video_server" pkg="web_video_server" type="web_video_server" />
-</launch>
-```
-- Build package:
-`cd ..`
-`catkin_make `
-- And run created launch file:
-`roslaunch vidsrv vidsrv.launch `
-- Now open URL in web browser: {Jetson_IP}:8080
 
 ## Jetson NANO
 Follow the isntructions from [NVIDIA](https://developer.nvidia.com/embedded/learn/get-started-jetson-nano-devkit#write)
@@ -183,6 +98,67 @@ $ echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
 $ source ~/.bashrc
 ```
 
+## Installing other repositories
+- Install LiDAR
+  `sudo apt install ros-melodic-urg-node`
+- Install Joy
+  `sudo apt install ros-melodic-joy`
+- Install tf
+	`sudo apt install ros-melodic-tf`
+- Install the MTi USB Serial Driver
+  ```
+  $ git clone https://github.com/xsens/xsens_mt.git
+  $ cd ~/xsens_mt
+  $ make
+  $ sudo modprobe usbserial
+  $ sudo insmod ./xsens_mt.ko
+  ```
+- Install gps_common or gps_umd as available based on the ROS distributable
+  `sudo apt-get install ros-melodic-gps-umd` or `sudo apt-get install ros-melodic-gps-common`
+- Isntall MTi rosnode
+    ```
+  $ cd ~/catkin_ws/src
+  $ git clone https://github.com/HaroldMurcia/xsens_mti_ros_node.git
+  $ cd ~/catkin_ws/
+  $ catkin_make
+    ```
+- Install Dynamixel rosnode
+    ```
+  $ cd ~/catkin_ws/src
+  $ git clone https://github.com/HaroldMurcia/dynamixel_motor.git
+  $ cd ~/catkin_ws/
+  $ catkin_make
+    ```
+- Install usb cam rosnode
+    ```
+  $ cd ~/catkin_ws/src
+  $ git clone https://github.com/HaroldMurcia/usb_cam.git
+  $ cd ~/catkin_ws/
+  $ catkin_make
+    ```
+- Install orbit camera actuation rosnode
+    ```
+  $ cd ~/catkin_ws/src
+  $ git clone https://github.com/HaroldMurcia/orbit_camera_actuation.git
+  $ cd ~/catkin_ws/
+  $ catkin_make
+    ```
+- Install roboclaw rosnode
+    ```
+  $ cd ~/catkin_ws/src
+  $ git clone https://github.com/HaroldMurcia/roboclaw_ros.git
+  $ cd ~/catkin_ws/
+  $ catkin_make
+    ```
+- Install vidsrv rosnode
+    ```
+  $ cd ~/catkin_ws/src
+  $ git clone https://github.com/HaroldMurcia/vidsrv.git
+  $ cd ~/catkin_ws/
+  $ catkin_make
+    ```
+
+
 ## Installing AlphaROVER repository
 ```
 $ cd ~/catkin_ws/src
@@ -195,12 +171,13 @@ $ sudo ./config_init.sh
 $ sudo reboot
 ```
 
+
 ## Getting Started on host PC
 - Install hamachi and haguichi.
 
 ### Configuring a Linux-Supported Joystick with ROS
 - Install the package:
-  `sudo apt-get install ros-kinetic-joy`
+  `sudo apt-get install ros-melodic-joy`
 - Connect the joystick to your computer and let's see if Linux recognized it:
   `ls /dev/input/`
 - The joystick will be referred to by jsX, you can test it by running:
@@ -219,7 +196,7 @@ Move the joystick around to see the data change.
 
 ### Functions to add on PC's .bashrc file
 ```
-source /opt/ros/kinetic/setup.bash
+source /opt/ros/melodic/setup.bash
 
 function pilot
 {
