@@ -30,10 +30,6 @@ path_alpha_config=$(pwd)
 sudo chmod -R 777 $path_alpha_config$"/alphaROVER.sh"
 sudo cp $path_alpha_config$"/99-alphaBot.rules" "/etc/udev/rules.d/99-alphaBot.rules"
 sudo udevadm trigger
-sudo cp $path_alpha_config$"/rc.local" "/etc/rc.local"
-sudo chmod -R 777 /etc/rc.local
-sudo systemctl enable rc-local
-sudo systemctl start rc-local.service
-sudo systemctl status rc-local.service
 echo "source $path_alpha_config"/alphaROVER.sh"" >> ~/.bashrc
 cd $path_alpha_config
+source ~/.bashrc

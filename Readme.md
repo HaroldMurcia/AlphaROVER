@@ -68,6 +68,8 @@ This repository contents:
   `sudo apt install ros-melodic-urg-node`
 - Install Joy
   `sudo apt install ros-melodic-joy`
+- Install tf
+	`sudo apt install ros-melodic-tf`
 
 
 ## Jetson TK1
@@ -187,8 +189,8 @@ $ cd ~/catkin_ws/src
 $ git clone https://github.com/HaroldMurcia/AlphaROVER.git
 $ cd ~/catkin_ws/
 $ catkin_make
-$ cd ~/catkin_ws/src/AlphaROVER/Config
-$ chmod -R 777 config_init.sh
+$ cd ~/catkin_ws/src/AlphaROVER/src/Config/
+$ sudo chmod -R 777 config_init.sh
 $ sudo ./config_init.sh
 $ sudo reboot
 ```

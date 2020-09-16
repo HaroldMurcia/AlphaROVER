@@ -14,9 +14,10 @@ Notes           :Calling from .bashrc
 "
 
 today=$(date +%Y%m%d)
+echo $today
 div=======================================
 
-echo "
+printf "
       _       _         _____  _____  _____  _____  _____
  ___ | | ___ | |_  ___ | __  ||     ||  |  ||   __|| __  |
 | .'|| || . ||   || .'||    -||  |  ||  |  ||   __||    -|
@@ -27,10 +28,18 @@ echo "
 path_alpha_config=$(pwd)
 cd ../..
 path_alphaROVER=$(pwd)
-echo $path_alphaROVER
+echo "PATH:"$path_alphaROVER
 
 # Variables
 hokuyo_ip="192.168.0.10"
+
+# Ports
+# sudo chmod -R 777 /dev/tty_roboclaw
+sudo chmod -R 777 /dev/tty_roboclaw
+sudo chmod -R 777 /dev/tty_imu
+sudo chmod -R 777 /dev/tty_Arduino
+sudo chmod -R 777 /dev/tty_Dynamixel
+sudo chmod -R 777 /dev/tty_pololu
 
 # GPIOS Jetson NANO
 # 1: 1.6 volts	0:Zero volts
@@ -71,7 +80,7 @@ function urg_node {
 	echo "======================================="
 	rosrun urg_node urg_node _ip_address:=$hokuyo_ip _publish_multiecho:="true" &
 	sleep 1
-	echo "Hokuyo ready...\n"
+	printf "Hokuyo ready...\n"
 }
 
 function dynamixel_node {
@@ -80,13 +89,13 @@ function dynamixel_node {
 	sleep 1
 	roslaunch dynamixel_controllers start_tilt_controller.launch
 	sleep 1
-	echo "Dynamixel ready...\n"
+	printf "Dynamixel ready...\n"
 }
 
 function xsens_node {
 	echo "======================================="
 	roslaunch xsens_driver xsens.launch  &
-	echo $"Xsens MTi-10 ready...\n"
+	printf $"Xsens MTi-10 ready...\n"
 }
 
 function kinect_node {
@@ -100,41 +109,41 @@ function webcam {
 	echo "======================================="
   roslaunch usb_cam usb_cam-test.launch &
 	sleep 5
-	echo $"Main camera ready...\n"
+	printf $"Main camera ready...\n"
 }
 
 function GPS_node {
 	echo "======================================="
 	python $path_alphaROVER$"/src/Arduino/Arduino_serial.py" &
 	sleep 2
-	echo "GPS ready...\n"
+	printf "GPS ready...\n"
 }
 
 function roboclaw_node {
 	echo "======================================="
 	roslaunch roboclaw_node roboclaw.launch &
 	sleep 3
-	echo "Roboclaw ready...\n"
+	printf "Roboclaw ready...\n"
 }
 
 function arm_node {
 	echo "======================================="
 	python $path_alphaROVER$"/src/Arm/arm.py" &
 	sleep 1
-	echo "Arm ready...\n"
+	printf "Arm ready...\n"
 }
 
 function ekf_node {
 	echo "======================================="
 	python $path_alphaROVER$"/src/EKF/ekf2.py" &
-	echo "EKF ready...\n"
+	printf "EKF ready...\n"
 }
 
 function gscamInit_node {
 	echo "======================================="
 	export GSCAM_CONFIG="v4l2src device=/dev/video1 ! video/x-raw-rgb,framerate=30/1 ! ffmpegcolorspace"
 	rosrun gscam gscam &
-	echo "gscam is ready...\n"
+	printf "gscam is ready...\n"
 }
 
 function pilot {
@@ -143,14 +152,14 @@ function pilot {
 	sudo chmod a+rw /dev/input/js0			# permission options (all) + (read)(write)
 	rosparam set joy_node/dev "/dev/input/js0"	# ROS parameter assignment
 	rosrun joy joy_node &								# Run Joy_node
-	echo "Joy is ready...\n"
+	printf "Joy is ready...\n"
 }
 
 function USB {
 	echo "======================================="
 	sudo mount -t vfat /dev/sda1 /media/usb/ -o uid=1000,gid=1000
 	cd /media/usb
-	echo "USB is ready...\n"
+	printf "USB is ready...\n"
 }
 
 function exportar {
@@ -169,7 +178,7 @@ function exportar_hamachi {
 }
 
 function rover {
-	echo "\n======================================="
+	printf "\n======================================="
 	roscore &
 	sleep 4
 	pilot &
@@ -180,6 +189,6 @@ function rover {
 	sleep 3
 	ekf_node &
 	sleep 7
-	echo $"ROVER READY"
-	echo "=======================================\n"
+	printf $"ROVER READY\n"
+	printf "=======================================\n"
 }
