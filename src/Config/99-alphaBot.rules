@@ -1,0 +1,5 @@
+SUBSYSTEM=="tty", ATTRS{idVendor}=="03eb", ATTRS{idProduct}=="2404", SYMLINK+="tty_roboclaw"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="2639", ATTRS{idProduct}=="0003", SYMLINK+="tty_imu"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0424", ATTRS{idProduct}=="9514", SYMLINK+="tty_pololu"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0bda", ATTRS{idProduct}=="5411", SYMLINK+="tty_Arduino"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="fff1", ATTRS{idProduct}=="ff48", SYMLINK+="tty_Dynamixel"

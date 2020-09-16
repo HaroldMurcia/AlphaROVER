@@ -1,0 +1,46 @@
+#!/bin/sh -e
+#
+# rc.local
+#
+# This script is executed at the end of each multiuser runlevel.
+# Make sure that the script will "exit 0" on success or any other
+# value on error.
+#
+# In order to enable or disable this script just change the execution
+# bits.
+#
+# By default this script does nothing.
+
+echo "
+==============================================================================
+Title           :rc.local
+Description     :This script starts the alphaROVER.
+Author          :Harold F MURCIA - www.haroldmurcia.com
+Date            :16/09/2020
+Version         :0.1
+Usage           :rc.local
+Notes           :configurated at first time in config_init.sh
+==============================================================================
+"
+
+today=$(date +%Y%m%d)
+div=======================================
+
+echo "
+      _       _         _____  _____  _____  _____  _____
+ ___ | | ___ | |_  ___ | __  ||     ||  |  ||   __|| __  |
+| .'|| || . ||   || .'||    -||  |  ||  |  ||   __||    -|
+|__,||_||  _||_|_||__,||__|__||_____| \___/ |_____||__|__|
+        |_|
+"
+
+# Ports
+# sudo chmod -R 777 /dev/tty_roboclaw
+chmod -R 777 /dev/tty_roboclaw
+chmod -R 777 /dev/tty_imu
+chmod -R 777 /dev/tty_Arduino
+chmod -R 777 /dev/tty_Dynamixel
+chmod -R 777 /dev/tty_pololu
+
+
+exit 0
