@@ -105,6 +105,9 @@ $ source ~/.bashrc
   `sudo apt install ros-melodic-joy`
 - Install tf
 	`sudo apt install ros-melodic-tf`
+- Install MS Kinect V1
+	`sudo apt-get install libfreenect-dev`
+	`sudo apt-get install ros-melodic-freenect-launch`
 - Install the MTi USB Serial Driver
   ```
   $ git clone https://github.com/xsens/xsens_mt.git
@@ -129,10 +132,10 @@ $ source ~/.bashrc
   $ cd ~/catkin_ws/
   $ catkin_make
     ```
-- Install usb cam rosnode
+- Install gscam rosnode
     ```
   $ cd ~/catkin_ws/src
-  $ git clone https://github.com/HaroldMurcia/usb_cam.git
+  $ git clone https://github.com/HaroldMurcia/gscam.git
   $ cd ~/catkin_ws/
   $ catkin_make
     ```
@@ -154,6 +157,13 @@ $ source ~/.bashrc
     ```
   $ cd ~/catkin_ws/src
   $ git clone https://github.com/HaroldMurcia/vidsrv.git
+  $ cd ~/catkin_ws/
+  $ catkin_make
+    ```
+- Install Maestro rosnode
+    ```
+  $ cd ~/catkin_ws/src
+  $ git clone https://github.com/HaroldMurcia/Maestro.git
   $ cd ~/catkin_ws/
   $ catkin_make
     ```
