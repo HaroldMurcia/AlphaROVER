@@ -10,17 +10,16 @@ This repository contents:
 - Data files
 
 ```
-/your_root               / path
-|--README.md     		 / Instructions to configure the AlphaROVER
-|--src         			 / scripts for the system
-  |--alpha_pc            / scripts to launch the control of the system
+/your_root            / path
+|--README.md     		  / Instructions to configure the AlphaROVER
+|--src         			  / scripts for the system
 	  |--APPS
 	  |--Arduinio_gps+imu
 	  |--Arm            / Based on: https://github.com/FRC4564/Maestro/
 	  |--Cam            / Based on: https://github.com/ros-drivers/usb_cam
 	  |--Camera_actuation
 	  |--Config
-	  |--dynamixel_motor      / Based on: https://github.com/arebgun/dynamixel_motor.git
+	  |--dynamixel_motor/ Based on: https://github.com/arebgun/dynamixel_motor.git
 	  |--EKF
 	  |--GPIO
 	  |--Roboclaw       / Based on: https://github.com/sonyccd/roboclaw_ros
@@ -54,13 +53,15 @@ This repository contents:
 ## Software Requirements:
 - OpenCV
 - Hamachi
-- Modified node *xsens_mti_ros_node* available [here.](https://github.com/HaroldMurcia/xsens_mti_ros_node)
+- Modified node *xsens_mti_ros_node* available [here](https://github.com/HaroldMurcia/xsens_mti_ros_node)
 - Install the MTi USB Serial Driver
-  `git clone https://github.com/xsens/xsens_mt.git`
-  `cd ~/xsens_mt`
-  `make`
-  `sudo modprobe usbserial`
-  `sudo insmod ./xsens_mt.ko`
+  ```
+  git clone https://github.com/xsens/xsens_mt.git
+  cd ~/xsens_mt
+  make
+  sudo modprobe usbserial
+  sudo insmod ./xsens_mt.ko
+  ```
 - Install gps_common or gps_umd as available based on the ROS distributable
   `sudo apt-get install ros-melodic-gps-umd` or `sudo apt-get install ros-melodic-gps-common`
 - Install LiDAR
@@ -70,7 +71,7 @@ This repository contents:
 
 
 ## Jetson TK1
-Based on: https://developer.download.nvidia.com/embedded/L4T/r21_Release_v8.0/release_files/l4t_quick_start_guide.txt?2AJGr6ik6_g9nwN5HQ5Q2Zh8DJOTP4hQvehjztkoRcC0o4x_35fPIgZ8OOStLerVgY6a37NIBN9VFDC-kZmbKVFt7QG3zCIAF565Ages-cXgJkXhkqV_fGzqVarbLOQ-JTuidCfq2qnsmdUVltVu4ifN7R8m6NfQpobz6UxapI47LlCS
+Based on [flashing](https://developer.download.nvidia.com/embedded/L4T/r21_Release_v8.0/release_files/l4t_quick_start_guide.txt?2AJGr6ik6_g9nwN5HQ5Q2Zh8DJOTP4hQvehjztkoRcC0o4x_35fPIgZ8OOStLerVgY6a37NIBN9VFDC-kZmbKVFt7QG3zCIAF565Ages-cXgJkXhkqV_fGzqVarbLOQ-JTuidCfq2qnsmdUVltVu4ifN7R8m6NfQpobz6UxapI47LlCS)
 ```
 mkdir LT4
 cd LT4
@@ -181,35 +182,38 @@ $ source ~/.bashrc
 ```
 
 ## Installing AlphaROVER repository
-`cd ~/catkin_ws/src`
-`git clone https://github.com/HaroldMurcia/AlphaROVER.git`
-`cd ~/catkin_ws/`
-`catkin_make`
-`cd ~/catkin_ws/src/AlphaROVER/Config`
-`chmod -R 777 config_init.sh`
-`sudo ./config_init.sh`
-`sudo reboot`
+```
+$ cd ~/catkin_ws/src
+$ git clone https://github.com/HaroldMurcia/AlphaROVER.git
+$ cd ~/catkin_ws/
+$ catkin_make
+$ cd ~/catkin_ws/src/AlphaROVER/Config
+$ chmod -R 777 config_init.sh
+$ sudo ./config_init.sh
+$ sudo reboot
+```
 
 ## Getting Started on host PC
 - Install hamachi and haguichi.
 
 ### Configuring a Linux-Supported Joystick with ROS
 - Install the package:
-`sudo apt-get install ros-kinetic-joy`
+  `sudo apt-get install ros-kinetic-joy`
 - Connect the joystick to your computer and let's see if Linux recognized it:
-`ls /dev/input/`
+  `ls /dev/input/`
 - The joystick will be referred to by jsX, you can test it by running:
-`sudo jstest /dev/input/jsX`
+  `sudo jstest /dev/input/jsX`
 Move the joystick around to see the data change.
 - Give permissions on the joystick port:
-`sudo chmod a+rw /dev/input/jsX`
+  `sudo chmod a+rw /dev/input/jsX`
 - To start the joy node:
-`roscore`
-`rosparam set joy_node/dev "/dev/input/jsX"`
-`rosrun joy joy_node`
-
-To see the data from the joystick:
-`rostopic echo joy`
+  ```
+  roscore
+  rosparam set joy_node/dev "/dev/input/jsX"
+  rosrun joy joy_node
+  ```
+- To see the data from the joystick:
+  `rostopic echo joy`
 
 ### Functions to add on PC's .bashrc file
 ```
@@ -245,7 +249,6 @@ function webcam
 
 ## Authors:
 **[Universidad de Ibagué - Ingeniería Electrónica.](https://electronica.unibague.edu.co)**
-**Proyecto de Grado 2019/A**
 - [Nickson E. GARCIA](mailto:nicksongarcia@ieee.org)
 - [Cristian G. MOLINA](mailto:2420132009@estudiantesunibague.edu.co)
 - [Harold F. MURCIA](www.haroldmurcia.com)
