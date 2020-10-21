@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 import serial
 # import time
@@ -33,14 +33,25 @@ class GPS(object):
         self.MeasureCounting = 0
         self.time_utc = 0.0
         self.speed_m_s = 0.0
+        self.eLat = 0.0
+        self.eLon = 0.0
+        self.eAlt = 0.0
+        self.date = 0.0
+        self.COG = 0.0
+        self.Mag = 0.0
+        self.eMag = 0.0
+        
         
         self.x = 0.0
         self.y = 0.0
     
     def GpsTimeSeconds(self, Time_Gps):
-        H = float(Time_Gps[0:2])
-        M = float(Time_Gps[2:4])
-        S = float(Time_Gps[4:9])
+        aux = float(Time_Gps)
+        H = int(aux/10000.0)
+        aux = aux%10000.0
+        M = int(aux/100.0)
+        aux = aux%100.0
+        S = aux/100.0
         
         Time_seconds = H*3600 + M*60 + S
         return Time_seconds
@@ -51,7 +62,7 @@ class GPS(object):
         aux = data[0].split("'")
         data[0] = aux[1]
         if data[0] == "$GPGGA":
-            self.time_utc = float(data[1])
+            self.time_utc = self.GpsTimeSeconds(data[1])
             self.Latitude = int(float(data[2])/100.0)
             self.Latitude = self.Latitude + (float(data[2])%100.0)/60.0
             if data[3]=='N':
@@ -69,21 +80,18 @@ class GPS(object):
             self.DOP = float(data[8])
             self.altitude = float(data[9])
         if data[0] == "$GPRMC":
-            self.Latitude = int(float(data[3])/100.0)
-            self.Latitude = self.Latitude + (float(data[3])%100.0)/60.0
-            self.Longitude = int(float(data[5])/100.0)
-            self.Longitude = self.Longitude + (float(data[5])%100.0)/60.0
-            self.speed_m_s = float(data[7]) * 0.514444
-            self.time_utc = float(data[1])                
-            if self.speed_m_s < 0.5:
-                self.speed_m_s = 0.0
-                self.MeasureCounting += 1
-            if self.MeasureCounting == 1:
-                t_0 = self.GpsTimeSeconds(data[1])
-            else:
-                t_1 = self.GpsTimeSeconds(data[1])
-                self.distance = (t_1 - t_0) * self.speed_m_s
-                t_0 = t_1
+            self.speed_m_s = float(data[7])*0.514444
+            self.COG = float(data[8])
+            self.date = data[9]
+            self.Mag = float(data[10])
+            if data[11]=='E':
+                self.Mag = self.Mag*1.0
+            elif data[11]=='W':
+                self.Mag = self.Mag*-1.0
+        if data[0] == "$GPGBS":
+            self.eLat = float(data[2])
+            self.eLon = float(data[3])
+            self.eAlt = float(data[4])
     
     def LLH2GPS(self,Lat,Long):
         Long_rad = Long * (np.pi/180.0)
