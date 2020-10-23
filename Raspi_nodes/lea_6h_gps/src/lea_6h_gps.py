@@ -72,7 +72,7 @@ class GPS(object):
             self.Longitude = int(float(data[4])/100.0)
             self.Longitude = self.Longitude + (float(data[4])%100.0)/60.0
             if data[5]=='E':
-                self.Latitude = self.Longitude*1.0
+                self.Longitude = self.Longitude*1.0
             elif data[5]=='W':
                 self.Longitude = self.Longitude*-1.0
             self.quality = int(data[6])
