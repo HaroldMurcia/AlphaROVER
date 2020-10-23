@@ -25,9 +25,11 @@ printf "
         |_|
 "
 # Paths
+cd ~/catkin_ws/src/AlphaROVER/src/Config
 path_alpha_config=$(pwd)
 cd ../..
 path_alphaROVER=$(pwd)
+cd
 echo "PATH:"$path_alphaROVER
 
 # Variables
@@ -40,6 +42,8 @@ sudo chmod -R 777 /dev/tty_imu
 sudo chmod -R 777 /dev/tty_Arduino
 sudo chmod -R 777 /dev/tty_Dynamixel
 sudo chmod -R 777 /dev/tty_pololu
+
+sleep 1.5
 
 # GPIOS Jetson NANO
 # 1: 1.6 volts	0:Zero volts
