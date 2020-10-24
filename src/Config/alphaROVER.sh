@@ -36,7 +36,19 @@ echo "PATH:"$path_alphaROVER
 hokuyo_ip="192.168.0.10"
 
 # Instal mit_node
-
+DIR=$path_alpha_config$'/xsens_mt'
+if [ -d "$DIR" ]; then
+  ### Take action if $DIR exists ###
+  echo "mti config done!"
+else
+  cd $path_alpha_config
+  git clone https://github.com/xsens/xsens_mt.git
+  cd ~/xsens_mt
+  make
+  sleep 10
+  cd
+  ### echo "Error: ${DIR} not found. Can not continue."
+fi
 
 # Ports
 sudo chmod -R 777 /dev/tty_roboclaw
