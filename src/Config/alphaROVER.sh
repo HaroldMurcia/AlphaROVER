@@ -47,7 +47,7 @@ if [ -d "$DIR" ]; then
 else
   cd $path_alpha_config
   git clone https://github.com/xsens/xsens_mt.git
-  cd /xsens_mt
+  cd xsens_mt
   make
   sleep 10
   cd ~/catkin_ws
@@ -209,8 +209,9 @@ function gps_node {
 
 function um7_node {
         echo "======================================="
+	chmod +x $path_alphaROVER$"/src/um7_node/src/um7_node.py"
 	ls -l /dev/tty_um7
-	roslaunch lea_6h_gps lea_6h_gps.launch device_name:=/dev/tty_um7 &
+	roslaunch um7_node um7_node.launch device_name:=/dev/tty_um7 &
 	printf "UM7 imu is ready...\n"
 }
 
