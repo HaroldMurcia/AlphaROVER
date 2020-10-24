@@ -9,7 +9,7 @@ Webpage IMU: https://pypi.org/project/um7py/
 import rospy
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Quaternion, Vector3
-from tf.transformations import quaternion_from_euler
+#from tf.transformations import quaternion_from_euler
 import numpy as np
 
 from um7py import UM7Serial
@@ -17,6 +17,23 @@ from um7py import UM7Serial
 def deg2rad(angle):
     out = angle*np.pi/180.0
     return out
+
+def quaternion_from_euler(roll, pitch, yaw):
+    cy = np.cos(yaw * 0.5)
+    sy = np.sin(yaw * 0.5)
+    cp = np.cos(pitch * 0.5)
+    sp = np.sin(pitch * 0.5)
+    cr = np.cos(roll * 0.5)
+    sr = np.sin(roll * 0.5)
+
+    q = Quaternion()
+    print(q)
+    q.w = cr * cp * cy + sr * sp * sy
+    q.x = sr * cp * cy - cr * sp * sy
+    q.y = cr * sp * cy + sr * cp * sy
+    q.z = cr * cp * sy - sr * sp * cy
+
+    return q
     
 class IMU_node():
     def __init__(self):
@@ -35,7 +52,7 @@ class IMU_node():
         self.run()
     
     def run(self):
-        pub = rospy.Publisher('um7', Imu, queue_size=10)
+        pub = rospy.Publisher('/um7', Imu, queue_size=10)
         rate = rospy.Rate(100) # 100hz
         while not rospy.is_shutdown():
             self.UM7(self.um7_serial)

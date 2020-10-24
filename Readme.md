@@ -173,7 +173,11 @@ $ source ~/.bashrc
   $ cd ~/catkin_ws/
   $ catkin_make
     ```
-
+- Install um7 rosnode
+    ```
+  $ sudo pip3 install um7py
+  $ 
+    ```
 
 ## Installing AlphaROVER repository
 ```
