@@ -219,6 +219,10 @@ function exportar_hamachi {
         export ROS_MASTER_URI=http://25.103.174.150:11311
 }
 
+function Alpha_update {
+        git clone https://github.com/Tilaguy/AlphaROVER.git
+}
+
 function rover {
 	printf "\n======================================="
 	roscore &
