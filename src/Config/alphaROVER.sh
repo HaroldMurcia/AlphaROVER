@@ -39,12 +39,19 @@ hokuyo_ip="192.168.0.10"
 DIR=$path_alpha_config$'/xsens_mt'
 if [ -d "$DIR" ]; then
   ### Take action if $DIR exists ###
+  cd ~/catkin_ws
+  catkin_make
+  sleep 10
+  cd
   echo "mti config done!"
 else
   cd $path_alpha_config
   git clone https://github.com/xsens/xsens_mt.git
-  cd ~/xsens_mt
+  cd /xsens_mt
   make
+  sleep 10
+  cd ~/catkin_ws
+  catkin_make
   sleep 10
   cd
   ### echo "Error: ${DIR} not found. Can not continue."
