@@ -35,6 +35,9 @@ echo "PATH:"$path_alphaROVER
 # Variables
 hokuyo_ip="192.168.0.10"
 
+# Instal mit_node
+
+
 # Ports
 sudo chmod -R 777 /dev/tty_roboclaw
 #sudo chmod -R 777 /dev/tty_Arduino
