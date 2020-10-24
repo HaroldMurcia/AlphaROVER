@@ -117,6 +117,8 @@ function dynamixel_node {
 	sleep 1
 	roslaunch dynamixel_controllers start_tilt_controller.launch
 	sleep 1
+	roslaunch dynamixel_move dynamixel_move.launch &
+	sleep 1
 	printf "Dynamixel ready...\n"
 }
 
