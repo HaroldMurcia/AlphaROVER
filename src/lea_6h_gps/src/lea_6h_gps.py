@@ -46,7 +46,7 @@ class GPS(object):
         self.y = 0.0
     
     def GpsTimeSeconds(self, Time_Gps):
-        print(Time_Gps)
+        #print(Time_Gps)
         aux = float(Time_Gps)
         H = int(aux/10000.0)
         aux = aux%10000.0
@@ -59,8 +59,10 @@ class GPS(object):
     
     def GPS_read(self,serial):
         line = str(serial.readline())
-        print(line)
+        #print(line)
         data = line.split(",")
+        aux = data[0].split("','")
+        data[0] = aux[1]
         if data[0] == "$GPGGA":
             self.time_utc = self.GpsTimeSeconds(data[1])
             self.Latitude = int(float(data[2])/100.0)

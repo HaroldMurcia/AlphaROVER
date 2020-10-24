@@ -9,7 +9,7 @@ Webpage IMU: https://pypi.org/project/um7py/
 import rospy
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import Quaternion, Vector3
-import transformations as tf
+from tf.transformations import quaternion_from_euler
 import numpy as np
 
 from um7py import UM7Serial
@@ -57,7 +57,7 @@ class IMU_node():
             pitch = packet.pitch
             yaw = packet.yaw
             self.velocities = [packet.roll_rate, packet.pitch_rate, packet.yaw_rate]
-            self.q = tf.quaternion_from_euler(deg2rad(roll), deg2rad(pitch), deg2rad(yaw))
+            self.q = quaternion_from_euler(deg2rad(roll), deg2rad(pitch), deg2rad(yaw))
 
 if __name__ == '__main__':
     try:
