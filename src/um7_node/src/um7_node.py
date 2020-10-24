@@ -27,7 +27,7 @@ def quaternion_from_euler(roll, pitch, yaw):
     sr = np.sin(roll * 0.5)
 
     q = Quaternion()
-    print(q)
+    # print(q)
     q.w = cr * cp * cy + sr * sp * sy
     q.x = sr * cp * cy - cr * sp * sy
     q.y = cr * sp * cy + sr * cp * sy
@@ -60,7 +60,7 @@ class IMU_node():
             mesg = Imu()
             mesg.header.stamp = rospy.Time.now()
             mesg.header.frame_id = 'UM7'
-            mesg.orientation = Quaternion(*self.q)
+            mesg.orientation = self.q
             mesg.angular_velocity = Vector3(*self.velocities)
             
             pub.publish(mesg)
