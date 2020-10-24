@@ -119,6 +119,9 @@ $ source ~/.bashrc
 - Install gps_common or gps_umd as available based on the ROS distributable
   `sudo apt-get install ros-melodic-gps-umd` or `sudo apt-get install ros-melodic-gps-common`
 - Isntall MTi rosnode
+# write the next lines every time before call node.
+# sudo modprobe usbserial
+# sudo insmod $path_alpha_config$"/xsens_mt/xsens_mt.ko"
     ```
   $ cd ~/catkin_ws/src
   $ git clone https://github.com/HaroldMurcia/xsens_mti_ros_node.git
@@ -126,6 +129,8 @@ $ source ~/.bashrc
   $ catkin_make
     ```
 - Install Dynamixel rosnode
+# modify file catkin_ws/src/dynamixel_motor/dynamixel_controllers/launch/controller_manager.launch
+# chaging port_name with "/dev/tty_Dynamixel"
     ```
   $ cd ~/catkin_ws/src
   $ git clone https://github.com/HaroldMurcia/dynamixel_motor.git
