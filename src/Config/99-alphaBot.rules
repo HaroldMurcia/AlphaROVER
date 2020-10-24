@@ -4,5 +4,5 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="2639", ATTRS{idProduct}=="0003", SYMLINK+="t
 # SUBSYSTEM=="tty", ATTRS{idVendor}=="0bda", ATTRS{idProduct}=="5411", SYMLINK+="tty_Arduino"
 SUBSYSTEM=="tty", ATTRS{idVendor}=="fff1", ATTRS{idProduct}=="ff48", SYMLINK+="tty_Dynamixel"
 SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="tty_GPS"
-SUBSYSTEM=="tty", ATTRS{idVendor}=="1ffb", ATTRS{idProduct}=="0081", SYMLINK+="tty_um7"
+#SUBSYSTEM=="tty", ATTRS{idVendor}=="1ffb", ATTRS{idProduct}=="0081", SYMLINK+="tty_um7"
 SUBSYSTEM=="tty", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="c21f", SYMLINK+="F710"

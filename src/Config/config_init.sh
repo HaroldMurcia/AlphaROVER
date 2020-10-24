@@ -30,6 +30,6 @@ path_alpha_config=$(pwd)
 sudo chmod -R 777 $path_alpha_config$"/alphaROVER.sh"
 sudo cp $path_alpha_config$"/99-alphaBot.rules" "/etc/udev/rules.d/99-alphaBot.rules"
 sudo udevadm trigger
-echo "source $path_alpha_config"/alphaROVER.sh"" >> ~/.bashrc
+#echo "source $path_alpha_config"/alphaROVER.sh"" >> ~/.bashrc
 cd $path_alpha_config
 source ~/.bashrc

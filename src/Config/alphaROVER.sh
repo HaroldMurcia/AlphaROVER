@@ -145,13 +145,6 @@ function webcam {
 	printf $"Main camera ready...\n"
 }
 
-function GPS_node {
-	echo "======================================="
-	python $path_alphaROVER$"/src/Arduino/Arduino_serial.py" &
-	sleep 2
-	printf "GPS ready...\n"
-}
-
 function roboclaw_node {
 	echo "======================================="
 	ls -l /dev/tty_roboclaw
@@ -210,14 +203,14 @@ function exportar_ws {
 function gps_node {
         echo "======================================="
 	ls -l /dev/tty_GPS
-	rosrun lea_6h_gps lea_6h_gps.launch device_name:=/dev/tty_GPS &
-	printf "UM7 imu is ready...\n"
+	roslaunch lea_6h_gps lea_6h_gps.launch device_name:=/dev/tty_GPS &
+	printf "GPS is ready...\n"
 }
 
 function um7_node {
         echo "======================================="
 	ls -l /dev/tty_um7
-	rosrun um7_node um7_node.launch device_name:=/dev/tty_um7 &
+	roslaunch lea_6h_gps lea_6h_gps.launch device_name:=/dev/tty_um7 &
 	printf "UM7 imu is ready...\n"
 }
 
