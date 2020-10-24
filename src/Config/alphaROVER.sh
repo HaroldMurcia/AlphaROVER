@@ -112,10 +112,10 @@ function urg_node {
 
 function dynamixel_node {
 	echo "======================================="
-	ls -l /dev/tty_dynamixel
-	roslaunch dynamixel_controllers controller_manager.launch &
+	ls -l /dev/tty_Dynamixel
+	roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch usb_port:=/dev/tty_Dynamixel &
 	sleep 1
-	roslaunch dynamixel_controllers start_tilt_controller.launch
+	roslaunch dynamixel_workbench_operators joint_operator.launch &
 	sleep 1
 	roslaunch dynamixel_move dynamixel_move.launch &
 	sleep 1
