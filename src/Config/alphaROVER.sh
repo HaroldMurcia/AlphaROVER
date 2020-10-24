@@ -114,11 +114,11 @@ function dynamixel_node {
 	echo "======================================="
 	ls -l /dev/tty_Dynamixel
 	roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch usb_port:=/dev/tty_Dynamixel &
-	sleep 1
+	sleep 3
 	roslaunch dynamixel_workbench_operators joint_operator.launch &
-	sleep 1
+	sleep 3
 	roslaunch dynamixel_move dynamixel_move.launch &
-	sleep 1
+	sleep 3	
 	printf "Dynamixel ready...\n"
 }
 
@@ -213,7 +213,7 @@ function um7_node {
         echo "======================================="
 	chmod +x $path_alphaROVER$"/src/um7_node/src/um7_node.py"
 	ls -l /dev/tty_um7
-	roslaunch um7_node um7_node.launch device_name:=/dev/tty_um7 &
+	roslaunch um7_node um7_node.launch device_name:=/dev/tty_GPS &
 	printf "UM7 imu is ready...\n"
 }
 
