@@ -68,7 +68,7 @@ class IMU_node():
     
     
     def UM7(self,IMU):
-        for packet in IMU.recv_euler_broadcast(5):
+        for packet in IMU.recv_euler_broadcast(1):
             # print(f"packet: {packet}")
             roll = packet.roll
             pitch = packet.pitch
