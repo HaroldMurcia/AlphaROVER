@@ -115,10 +115,10 @@ function dynamixel_node {
 	ls -l /dev/tty_Dynamixel
 	roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch usb_port:=/dev/tty_Dynamixel &
 	sleep 3
-	roslaunch dynamixel_workbench_operators joint_operator.launch &
-	sleep 3
-	roslaunch dynamixel_move dynamixel_move.launch &
-	sleep 3	
+#	roslaunch dynamixel_workbench_operators joint_operator.launch &
+#	sleep 3
+#	roslaunch dynamixel_move dynamixel_move.launch &
+#	sleep 3	
 	printf "Dynamixel ready...\n"
 }
 
@@ -177,10 +177,10 @@ function gscamInit_node {
 
 function pilot {
 	echo "======================================="
-	ls -l /dev/input/js0							  # check joystick connection
+	ls -l /dev/input/js0				# check joystick connection
 	sudo chmod a+rw /dev/input/js0			# permission options (all) + (read)(write)
 	rosparam set joy_node/dev "/dev/input/js0"	# ROS parameter assignment
-	rosrun joy joy_node &								# Run Joy_node
+	rosrun joy joy_node &				# Run Joy_node
 	printf "Joy is ready...\n"
 }
 
