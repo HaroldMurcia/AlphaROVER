@@ -120,9 +120,9 @@ $ source ~/.bashrc
 - Install gps_common or gps_umd as available based on the ROS distributable
   `sudo apt-get install ros-melodic-gps-umd` or `sudo apt-get install ros-melodic-gps-common`
 - Isntall MTi rosnode
-  # write the next lines every time before call node.
-  # sudo modprobe usbserial
-  # sudo insmod $path_alpha_config$"/xsens_mt/xsens_mt.ko"
+#write the next lines every time before call node.
+#sudo modprobe usbserial
+#sudo insmod $path_alpha_config$"/xsens_mt/xsens_mt.ko"
     ```
   $ cd ~/catkin_ws/src
   $ git clone https://github.com/HaroldMurcia/xsens_mti_ros_node.git
@@ -130,11 +130,12 @@ $ source ~/.bashrc
   $ catkin_make
     ```
 - Install Dynamixel rosnode
-  # modify file catkin_ws/src/dynamixel_motor/dynamixel_controllers/launch/controller_manager.launch
-  # chaging port_name with "/dev/tty_Dynamixel"
     ```
   $ cd ~/catkin_ws/src
-  $ git clone https://github.com/HaroldMurcia/dynamixel_motor.git
+  $ mkdir dynamixel_node
+  $ git clone https://github.com/ROBOTIS-GIT/dynamixel-workbench.git
+  $ git clone https://github.com/ROBOTIS-GIT/dynamixel-workbench-msgs.git
+  $ git clone https://github.com/ROBOTIS-GIT/DynamixelSDK.git
   $ cd ~/catkin_ws/
   $ catkin_make
     ```
@@ -172,11 +173,6 @@ $ source ~/.bashrc
   $ git clone https://github.com/HaroldMurcia/Maestro.git
   $ cd ~/catkin_ws/
   $ catkin_make
-    ```
-- Install um7 rosnode
-    ```
-  $ sudo pip3 install um7py
-  $ 
     ```
 
 ## Installing AlphaROVER repository
@@ -243,8 +239,30 @@ function webcam
 	python ~/cam_bridge.py
 }
 ```
+## Launch of applications
 
+# 3D scan routine
+To launch correctly the scan algorithm, there are some minimum nodes required before to launch.
+```
+$ um7_node
+$ urg_node
+$ pilot
+$ dynamixel_node
+```
+Once all nodes are correctly work the '3D scan routine' can be executed with:
+```
+$ python $path_alphaROVER$"/src/Apps/scan3d.py" -o [output_file] -<options> [arguments]
+```
+Where <output_file> must be remplace by the name of the desired rosbag. The options and its respectively arguments are presented y the table below.
 
+| Options | Arguments | Description |
+| --- | --- | --- |
+| h |  | Give information of all options and arguments. |
+| o | [filename] | Name of orsbag where the topics will be save. |
+| q |  | Do not show message information while execution. |
+| a |  | Save all currents topics, if is not selected save the topics of the minimum nodes. |
+| s | [from] [to] [step] | Select the sweep scan mode. |
+| f | [angle] | Select the fixed scan mode. |
 
 ## Authors:
 **[Universidad de Ibagué - Ingeniería Electrónica.](https://electronica.unibague.edu.co)**
@@ -261,3 +279,4 @@ function webcam
 [ind]: <http://wiki.ros.org/indigo/Installation/Ubuntu>
 [ind-j]: <http://wiki.ros.org/indigo/Installation/UbuntuARM>
 [ham]: <https://medium.com/@KyleARector/logmein-hamachi-on-raspberry-pi-ad2ba3619f3a>
+[um7]: <https://pypi.org/project/um7py/>
