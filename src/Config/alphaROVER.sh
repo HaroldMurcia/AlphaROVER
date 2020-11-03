@@ -106,7 +106,7 @@ click
 function urg_node {
 	echo "======================================="
 	rosrun urg_node urg_node _ip_address:=$hokuyo_ip _publish_multiecho:="true" &
-	sleep 1
+	sleep 2
 	printf "Hokuyo ready...\n"
 }
 
@@ -115,10 +115,6 @@ function dynamixel_node {
 	ls -l /dev/tty_Dynamixel
 	roslaunch dynamixel_workbench_controllers dynamixel_controllers.launch usb_port:=/dev/tty_Dynamixel &
 	sleep 3
-#	roslaunch dynamixel_workbench_operators joint_operator.launch &
-#	sleep 3
-#	roslaunch dynamixel_move dynamixel_move.launch &
-#	sleep 3	
 	printf "Dynamixel ready...\n"
 }
 
@@ -206,6 +202,7 @@ function gps_node {
         echo "======================================="
 	ls -l /dev/tty_GPS
 	roslaunch lea_6h_gps lea_6h_gps.launch device_name:=/dev/tty_GPS &
+	sleep 3
 	printf "GPS is ready...\n"
 }
 
@@ -214,6 +211,7 @@ function um7_node {
 	chmod +x $path_alphaROVER$"/src/um7_node/src/um7_node.py"
 	ls -l /dev/tty_um7
 	roslaunch um7_node um7_node.launch device_name:=/dev/tty_GPS &
+	sleep 3
 	printf "UM7 imu is ready...\n"
 }
 
