@@ -13,6 +13,7 @@ import os
 from optparse import OptionParser
 import time as T
 from sensor_msgs.msg import Imu, JointState, Joy
+from std_msgs.msg import Bool
 import trajectory_msgs.msg as tm
 import numpy as np
 from math import asin, copysign
@@ -24,6 +25,7 @@ def_angle_fix = [-np.pi/4.0,] # 45°
 min_fix_angle = -np.pi/4.0
 
 flag_all = False
+flag_is_saving = False
 
 motor_offset = -np.pi/2.0 #-90°
 w_max = np.pi/90.0
@@ -31,11 +33,28 @@ w_max = np.pi/90.0
 flag_print = False
 bagname = ""
 bag_node = ""
+topics_list = ['/gps/odom','/gps/data','/gps/str'
+               '/um7',
+               '/cam_time',
+               '/ekf','/odom_alpha','/ekf2','/velocity',
+               '/UL','/UR','/WL','/WL_ref','/WR','/WR_ref','/ctrl_flag',
+               '/enc_L','/enc_R',
+               '/iL','/iR','/voltage',
+               '/diagnostics','/diagnostics_agg','/diagnostics_toplevel_state',
+               '/echoes',
+               '/imu/data','/imu/mag',
+               '/joy', '/SaveData_flag',
+               '/dynamixel_workbench/joint_states',
+               '/camera/rgb/image_color']
+topic2save = ' '.join(topics_list)
+# print(topic2save)
 
-pub = rospy.Publisher('/dynamixel_workbench/joint_trajectory', tm.JointTrajectory, queue_size=10)        
+pub = rospy.Publisher('/dynamixel_workbench/joint_trajectory', tm.JointTrajectory, queue_size=10)
+pub_flag = rospy.Publisher('/SaveData_flag', Bool, queue_size=10)
 tilt = tm.JointTrajectory()
 tilt.header.frame_id = "joint_trajectory"
 tilt.joint_names = ["tilt"]
+Flag_data = Bool()
 
 # %% Functions
 def q2pitch(q):
@@ -55,12 +74,28 @@ def deco_arg(options, args):
     in_angles = [float(i)*np.pi/(-180.0) for i in args]
     
     # output file name
+    path = 'bags/'
+    if os.path.isdir(path):
+        os.system('ls %s -l' % path)
+    else:
+        os.system('mkdir bags')
+        T.sleep(1)
+        os.system('ls %s -l' % path)
+    # path = '/media/bags/'
+    # ## USB_mount?
+    # if os.path.ismount(path):
+    #     os.system('ls %s -l' % path)
+    # else:
+    #     os.system('sudo mount -t vfat /dev/sda1 /media/bags/ -o uid=1000,gid=1000')
+    #     T.sleep(1)
+    #     os.system('ls %s -l' % path)
+    
     if options.filename == None:
         now = datetime.now()
         now = now.strftime("%d%m%Y%H%M%S")
-        bagname = 'bags/' + now
+        bagname = path + now
     else:
-        bagname = 'bags/' + options.filename
+        bagname = path + options.filename
     L = len(bagname)
     if not bagname[L-4:L] == '.bag':
         bagname = bagname+'.bag'
@@ -115,8 +150,9 @@ def deco_arg(options, args):
     else:
         raise Exception("Scan mode not selected, use -h to get help.")
 
-def check_topics(topics):
-    flags = [False,False,False,False,False,False,False]
+def check_topics():
+    topics = rospy.get_published_topics()
+    flags = [False,False,False,False]
     for topic_name,topic_type in topics:
         if topic_name == '/um7':
             flags[0] = True
@@ -128,6 +164,7 @@ def check_topics(topics):
             flags[3] = True
     if not np.sum(flags[0:4]) == 4:
         raise Exception("The minimum nodes for the scanning process have not been released.")
+    return topics
     
 def fixed_scan_mode(angle):
     global flag_all
@@ -139,7 +176,10 @@ def fixed_scan_mode(angle):
         print("=====================================================")
     # Comand read
     rospy.Subscriber("/joy", Joy, joy_event)
-    rospy.spin()
+    r_time = rospy.Rate(100)
+    while not rospy.is_shutdown():
+        pub_flag.publish(Flag_data)
+        r_time.sleep()
         
 
 def sweep_scan_mode(angle_max, angle_min, step):
@@ -153,7 +193,7 @@ def sweep_scan_mode(angle_max, angle_min, step):
     if flag_all:
         os.system("rosbag record -O %s -a &" % bagname)
     else:
-        os.system("rosbag record -O %s /gps/odom /gps/data /um7 /RefL /RefR /WL /WR /currents /diagnostics /diagnostics_agg /diagnostics_toplevel_state /echoes /ekf /encoders /first /imu_data /joy /laser_status /last /most_intense /motor_states /dxl_tty1 /mti/filter/orientation /mti/filter/position /mti/filter/velocity /mti/sensor/gnssPvt /mti/sensor/imu_free /mti/sensor/magnetic /mti/sensor/pressure /mti/sensor/sample /mti/temperature /odom /pid /speed /dynamixel_workbench/joint_states /dynamixel_workbench/joint_trajectory /urg_node/parameter_descriptions /urg_node/parameter_updates /voltage /camera/rgb/image_color &" % bagname)
+        os.system("rosbag record -O %s %s &" % (bagname, topic2save))
     T.sleep(5)
     node_names = rosnode.get_node_names()
     bag_node = [i for i in node_names if 'record' in i]
@@ -170,11 +210,12 @@ def move_motor(angle):
     
     motor = rospy.wait_for_message('/dynamixel_workbench/joint_states', JointState)
     cur_pos = motor.position
+
     
     up = 0.0
     ui = 0.0
     
-    while np.abs(angle-pitch_m) > 0.02: # error of +/- 1°
+    while np.abs(angle-pitch_m) > 0.02: # error of +/- 2°
         
         e = angle-pitch_m
         up = 0.75*e
@@ -208,34 +249,44 @@ def move_motor(angle):
     return pitch_m
 
 def scan_motor(angle1, angle2, N, t):
-    global pub, tilt
+    global pub, tilt, pub_flag, Flag_data
+    
+    motor = rospy.wait_for_message('/dynamixel_workbench/joint_states', JointState)
+    cur_pos = motor.position
+    e = angle1-cur_pos[0]
     
     t_step = t/N
-    angles = np.linspace(angle1, angle2, int(N))
+    angles = np.linspace(cur_pos, angle2+np.abs(e), int(N))
     
     imu = rospy.wait_for_message('/um7', Imu)
     q = imu.orientation
     pitch_m = q2pitch(q)
     
-    motor = rospy.wait_for_message('/dynamixel_workbench/joint_states', JointState)
-    cur_pos = motor.position
     if flag_print:
+        print("Scanning")
         print("imu: %.4f" % (pitch_m*180.0/np.pi))
         print("motor: %.4f" % (cur_pos[0]*180/np.pi))
         print("---------------------------")
+    
+    t_i = T.time()
     for i in angles:
         tilt.header.stamp = rospy.Time.now()
         jtp = tm.JointTrajectoryPoint()
         jtp.positions = [i]
-        jtp.velocities = np.zeros(1)
+        jtp.velocities = [0]
         jtp.time_from_start = rospy.Duration(t_step) # sec - relative to speed
          
         tilt.points = [jtp]
         pub.publish(tilt)
         
-        T.sleep(t_step)
+        T.sleep(5-t_step)
+        Flag_data = True
+        pub_flag.publish(Flag_data)
+        T.sleep(0.5)
+        Flag_data = False
+        pub_flag.publish(Flag_data)
         
-    imu = rospy.wait_for_message('/um7', Imu)
+    imu = rospy.wait_for_message('/um7', Imu)   
     q = imu.orientation
     pitch_m = q2pitch(q)
     
@@ -244,6 +295,7 @@ def scan_motor(angle1, angle2, N, t):
     if flag_print:
         print("imu: %.4f" % (pitch_m*180.0/np.pi))
         print("motor: %.4f" % (cur_pos[0]*180/np.pi))
+        print("Scan time: %.2f seg" % (T.time()-t_i))
         print("---------------------------")
 
 def go2top():
@@ -268,7 +320,7 @@ def go2top():
         T.sleep(time_to_move + 0.1)
         
 def joy_event(data):
-    global flag_all, bag_node
+    global flag_all, bag_node, pub_flag, Flag_data, flag_is_saving
     # Charectization GamePad Logitech F710
     # READ BUTTONS
     A = data.buttons[0]
@@ -294,23 +346,29 @@ def joy_event(data):
     
     
     # Rosbag line
-    if Y==1 and A==1: # Rosbag beginning 
+    if Y==1 and A==1 and not flag_is_saving: # Rosbag beginning 
+        Flag_data = True
         if flag_all:
             os.system("rosbag record -O %s -a &" % bagname)
         else:
-            os.system("rosbag record -O %s /gps/odom /gps/data /um7 /RefL /RefR /WL /WR /currents /diagnostics /diagnostics_agg /diagnostics_toplevel_state /echoes /ekf /encoders /first /imu_data /joy /laser_status /last /most_intense /motor_states /dxl_tty1 /mti/filter/orientation /mti/filter/position /mti/filter/velocity /mti/sensor/gnssPvt /mti/sensor/imu_free /mti/sensor/magnetic /mti/sensor/pressure /mti/sensor/sample /mti/temperature /odom /pid /speed /dynamixel_workbench/joint_states /dynamixel_workbench/joint_trajectory /urg_node/parameter_descriptions /urg_node/parameter_updates /voltage /camera/rgb/image_color &" % bagname)
+            os.system("rosbag record -O %s %s &" % (bagname, topic2save))
         T.sleep(5)
         node_names = rosnode.get_node_names()
         bag_node = [i for i in node_names if 'record' in i]
         print("ROS bag node name: %s" % bag_node)
-    if Y==1 and B==1: # Rosbag end
+        flag_is_saving = True
+    if Y==1 and B==1 and flag_is_saving : # Rosbag end
+        Flag_data = False
         os.system("rosnode kill %s" % bag_node[0])
+        rospy.signal_shutdown('finish')
         exit()
 
 def main():
+    global topics, Flag_data, pub_flag
     rospy.init_node('scan_node')
-    topics = rospy.get_published_topics()
-    check_topics(topics)
+    Flag_data = False
+    pub_flag.publish(Flag_data)
+    topics = check_topics()
     deco_arg(options, args)
     exit()
     
