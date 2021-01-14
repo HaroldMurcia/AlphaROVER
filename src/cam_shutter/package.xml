@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+  <name>cam_shutter</name>
+  <version>1.0.0</version>
+  <description>ROS interface to shutter a camera while the mobile robot is in motion</description>
+
+  <maintainer email="sebastian.tilaguy@gmail.com">Sebastian Tilaguy</maintainer>
+
+  <license>Unibague</license>
+
+  <!-- <url type="website"> </url> -->
+
+  <author email="sebastian.tilaguy@unibague.edu.co">Sebastian Tilaguy</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>rospy</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>nav_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <run_depend>rospy</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>nav_msgs</run_depend>
+  <run_depend>std_msgs</run_depend>
+
+  <build_depend>roslaunch</build_depend>
+  
+</package>
