@@ -1,0 +1,15 @@
+<launch>
+
+ <!--Argument-->
+ <!--Movement spesifications-->
+ <arg name="overlap" default="0.3" />
+ <arg name="max_dist" default="3" />
+
+ <!--Start the action-->
+ <node pkg="cam_shutter" type="cam_shutter.py" name="cam_shutter" output="screen" >
+   <param name="overlap" value="$(arg overlap)" />
+   <param name="Depth_filed" value="$(arg max_dist)" />
+   <rosparam command="load" file="$(find cam_shutter)/params/camera.yaml" />
+ </node>
+
+</launch>
