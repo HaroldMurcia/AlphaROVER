@@ -1,0 +1,13 @@
+###  Camera spesifications
+## Camera miltispectral ADC micro
+Cam_ref: MS-ADCu
+
+# The focal length of an optical system is a measure of how strongly the system converges or diverges light; it is the inverse of the system's optical power. 
+Focal_len: 0.00843 # 8.43/1000.0
+
+# The image sensor format of a digital camera determines the angle of view of a particular lens when used with a particular sensor.
+Sensor_dim_h: 0.00654 # 6.55/1000.0
+Sensor_dim_w: 0.00492 # 4.92/1000.0
+
+# Pixel size in meteres
+Pixel_size: 0.0000032 # 3.2/1000000.0
