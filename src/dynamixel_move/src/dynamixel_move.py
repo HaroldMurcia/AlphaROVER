@@ -34,8 +34,9 @@ class motor():
         
         jtp = tm.JointTrajectoryPoint()
         jtp.positions = [self.angle]
-        jtp.velocities = zeros(len(jtp.positions))
-        jtp.time_from_start = rospy.Duration(1)
+        jtp.velocities = [0.5]
+        jtp.effort = [0.3]
+        jtp.time_from_start = rospy.Duration(2)
         
         tilt.points = [jtp]
         

@@ -1,0 +1,6 @@
+<launch>
+    <!--Argument to launch file-->
+
+    <!--Start the action-->
+    <node name="speed_control" pkg="speed_control" type="speed_control.py" output="screen"/>
+</launch>

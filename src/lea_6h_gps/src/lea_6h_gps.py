@@ -7,6 +7,7 @@ import numpy as np # se emplea esta para operar matrices
 
 from nav_msgs.msg import Odometry
 from sensor_msgs.msg import NavSatFix
+from std_msgs.msg import String
 
 class GPS(object):
     def __init__(self):
@@ -41,9 +42,10 @@ class GPS(object):
         self.Mag = 0.0
         self.eMag = 0.0
         
-        
         self.x = 0.0
         self.y = 0.0
+        
+        self.line = ''
     
     def GpsTimeSeconds(self, Time_Gps):
         #print(Time_Gps)
@@ -58,11 +60,20 @@ class GPS(object):
         return Time_seconds
     
     def GPS_read(self,serial):
-        line = str(serial.readline())
-        #print(line)
-        data = line.split(",")
-        aux = data[0].split("','")
-        data[0] = aux[1]
+        # print('')
+        # print('')
+        # print('==================================================')
+        lin_ser = str(serial.readline())
+        lin_ser = lin_ser.strip("b''")
+        # print(len(lin_ser))
+        # print(lin_ser)
+        if not len(lin_ser) == 0:
+            self.line = lin_ser
+        # print(self.line)
+        # print('==================================================')
+        # print('')
+        data = self.line.split(',')
+        # print(data)
         if data[0] == "$GPGGA":
             self.time_utc = self.GpsTimeSeconds(data[1])
             self.Latitude = int(float(data[2])/100.0)
@@ -81,6 +92,8 @@ class GPS(object):
             self.satelites = float(data[7])
             self.DOP = float(data[8])
             self.altitude = float(data[9])
+            # print(self.time_utc,self.Latitude,self.Longitude,self.quality,
+            #       self.satelites,self.DOP,self.altitude)
         if data[0] == "$GPRMC":
             self.speed_m_s = float(data[7])*0.514444
             self.COG = float(data[8])
@@ -90,11 +103,12 @@ class GPS(object):
                 self.Mag = self.Mag*1.0
             elif data[11]=='W':
                 self.Mag = self.Mag*-1.0
-            print(self.Mag)
+            # print(self.speed_m_s, self.COG, self.date, self.Mag)
         if data[0] == "$GPGBS":
             self.eLat = float(data[2])
             self.eLon = float(data[3])
             self.eAlt = float(data[4])
+            # print(self.eLat, self.eLon, self.eAlt)
     
     def LLH2GPS(self,Lat,Long):
         Long_rad = Long * (np.pi/180.0)
@@ -111,18 +125,18 @@ class GPS(object):
         #Estimation of parameters
         
         A = np.cos(Lat_rad) * np.sin(delta_lambda0)
-        xi = 0.5 * np.log((1+A)/(1.0-A))
+        xi = 0.5 * np.log((1+A)/(1-A))
         eta = np.arctan(np.tan(Lat_rad)/np.cos(delta_lambda0)) - Lat_rad
-        nu = (self.c*0.9996)/np.sqrt((1.0 + self.e2*np.cos(Lat_rad)*np.cos(Lat_rad)))
-        zeta = (self.e2/2.0)*(xi*xi)*(np.cos(Lat_rad)*np.cos(Lat_rad))
-        A1 = np.sin(2.0*Lat_rad)
-        A2 = A1 * (np.cos(Lat_rad)*np.cos(Lat_rad))
+        nu = self.c * 0.9996/np.sqrt(1 + self.e2*((np.cos(Lat_rad))**2))
+        zeta = (self.e2/2.0)*(xi*xi)*(np.cos(Lat_rad))**2
+        A1 = np.sin(2*Lat_rad)
+        A2 = A1 * (np.cos(Lat_rad))**2
         J2 = Lat_rad + A1/2.0
         J4 = (3*J2 + A2)/4.0
-        J6 = (5*J4 + A2 * (np.cos(Lat_rad)*np.cos(Lat_rad)))/3.0
+        J6 = (5*J4 + A2 * (np.cos(Lat_rad))**2)/3.0
         alpha2 = (3.0/4.0)*(self.e2)
         beta = (5.0/3.0)*(alpha2*alpha2)
-        gamma = (35.0/27.0)*(np.power(alpha2,2))
+        gamma = (35.0/27.0)*np.power(alpha2,3)
         B_phi = 0.9996 * self.c * (Lat_rad - alpha2 * J2 + beta * J4 - gamma * J6)
         
         self.x = xi*nu*(1+zeta/3.0)+500000.0
@@ -132,6 +146,7 @@ class GPS(object):
         rospy.init_node("GPS_DATA")
         pub1 = rospy.Publisher('/gps/odom', Odometry, queue_size=10)
         pub2 = rospy.Publisher('/gps/data', NavSatFix, queue_size=10)
+        pub3 = rospy.Publisher('/gps/str', String, queue_size=10)
         gps = serial.Serial(self.port, baudrate = self.baud, timeout=0.1)
         if gps.isOpen():
             rate = rospy.Rate(100) # 100hz
@@ -155,7 +170,9 @@ class GPS(object):
                 gps_msg.latitude = self.Latitude
                 gps_msg.longitude = self.Longitude
                 gps_msg.altitude = self.altitude
-                gps_msg.position_covariance = np.array([self.eLat,0.0,0.0, 0.0,self.eLon,0.0, 0.0,0.0,self.eLon])
+                gps_msg.position_covariance = np.array([self.eLat,0.0,0.0,
+                                                        0.0,self.eLon,0.0,
+                                                        0.0,0.0,self.eAlt])
                 
                 gps_odm = Odometry()
                 gps_odm.header.stamp = rospy.get_rostime()
@@ -164,9 +181,12 @@ class GPS(object):
                 gps_odm.pose.pose.position.x = self.x
                 gps_odm.pose.pose.position.y = self.y
                 gps_odm.pose.pose.position.z = self.altitude
+                gps_odm.pose.pose.orientation.z = self.COG
+                gps_odm.twist.twist.linear.x = self.speed_m_s
                 
                 pub1.publish(gps_odm)
                 pub2.publish(gps_msg)
+                pub3.publish(self.line)
                 rate.sleep()
                 
 if __name__ == '__main__':
