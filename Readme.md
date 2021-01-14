@@ -19,12 +19,16 @@ This repository contents:
 |--README.md     		  / Instructions to configure the AlphaROVER
 |--src         			  / scripts for the system
 	  |--APPS
-	  |--Arduinio_gps+imu
 	  |--Arm            / Based on: https://github.com/FRC4564/Maestro/
 	  |--Config
-	  |--Control
 	  |--EKF
 	  |--GPIO
+	  |--Cam_Shutter
+	  |--Command_Center
+	  |--Dynamixel_Move
+	  |--Lea_6h_GPS
+	  |--Speed_Control
+	  |--UM7_node
 |--data
 	|--mechanics  
 		|--alpha_full.pdf
@@ -241,19 +245,16 @@ function webcam
 ```
 ## Launch of applications
 
-# 3D scan routine
-To launch correctly the scan algorithm, there are some minimum nodes required before to launch.
+### 3D scan routine
+To launch correctly the scan algorithm, there are some minimum nodes required before to launch, all of them are properly launched using the function bellow.
 ```
-$ um7_node
-$ urg_node
-$ pilot
-$ dynamixel_node
+$ scan_mode
 ```
 Once all nodes are correctly work the '3D scan routine' can be executed with:
 ```
-$ python $path_alphaROVER$"/src/Apps/scan3d.py" -o [output_file] -<options> [arguments]
+$ python scan3d.py" -o [output_file] -<options> [arguments]
 ```
-Where <output_file> must be remplace by the name of the desired rosbag. The options and its respectively arguments are presented y the table below.
+Where *<output_file>* should be replaced by the name of the desired rosbag file. The options and its respectively arguments are presented y the table below.
 
 | Options | Arguments | Description |
 | --- | --- | --- |
@@ -266,6 +267,7 @@ Where <output_file> must be remplace by the name of the desired rosbag. The opti
 
 ## Authors:
 **[Universidad de Ibagué - Ingeniería Electrónica.](https://electronica.unibague.edu.co)**
+- [Sebastian Tilaguy](mailto:sebastian.tilaguy@gmail.com)
 - [Nickson E. GARCIA](mailto:nicksongarcia@ieee.org)
 - [Cristian G. MOLINA](mailto:2420132009@estudiantesunibague.edu.co)
 - [Harold F. MURCIA](www.haroldmurcia.com)
