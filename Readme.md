@@ -121,19 +121,19 @@ $ source ~/.bashrc
   $ sudo modprobe usbserial
   $ sudo insmod ./xsens_mt.ko
   ```
-- Install gps_common or gps_umd as available based on the ROS distributable
-  `sudo apt-get install ros-melodic-gps-umd` or `sudo apt-get install ros-melodic-gps-common`
+#- Install gps_common or gps_umd as available based on the ROS distributable
+#  `sudo apt-get install ros-melodic-gps-umd` or `sudo apt-get install ros-melodic-gps-common`
 - Isntall MTi rosnode
 #write the next lines every time before call node.
 #sudo modprobe usbserial
 #sudo insmod $path_alpha_config$"/xsens_mt/xsens_mt.ko"
     ```
   $ cd ~/catkin_ws/src
-  $ git clone https://github.com/HaroldMurcia/xsens_mti_ros_node.git
+  $ git clone https://github.com/ethz-asl/ethzasl_xsens_driver.git
   $ cd ~/catkin_ws/
   $ catkin_make
     ```
-- Install Dynamixel rosnode
+- Install [Dynamixel rosnode](https://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_workbench/#ros-tutorials)
     ```
   $ cd ~/catkin_ws/src
   $ mkdir dynamixel_node
