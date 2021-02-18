@@ -154,13 +154,14 @@ function roboclaw_node {
 function arm_node {
 	echo "======================================="
 	python $path_alphaROVER$"/src/Arm/arm.py" &
-	sleep 1
+	sleep 3
 	printf "Arm ready...\n"
 }
 
 function ekf_node {
 	echo "======================================="
-	python $path_alphaROVER$"/src/EKF/ekf2.py" &
+	python $path_alphaROVER$"/src/EKF/ekf4.py" &
+	sleep 3
 	printf "EKF ready...\n"
 }
 
@@ -231,7 +232,7 @@ function rover {
 	pilot &
 	sleep 2
 	xsens_node &
-	sleep 2
+	sleep 5
 	roboclaw_node &
 	sleep 3
 	ekf_node &
