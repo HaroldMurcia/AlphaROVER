@@ -1,0 +1,5 @@
+<launch>
+    <!--Start the action-->
+    <node name="dynamixel_move" pkg="dynamixel_move" type="dynamixel_move.py" output="screen"/>
+</launch>
+

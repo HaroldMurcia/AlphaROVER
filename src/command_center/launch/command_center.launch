@@ -1,0 +1,6 @@
+<launch>
+    <!--Argument to launch file-->
+    
+    <!--Start the action-->
+    <node name="command_center" pkg="command_center" type="command_center.py" output="screen"/>
+</launch>

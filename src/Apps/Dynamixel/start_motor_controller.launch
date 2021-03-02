@@ -1,9 +1,0 @@
-<launch>
-	<!-- Start motor controller -->
-	rosparam file="$(find controlador_motor_ax12)/robot_joint_description.yaml" command="load"/>
-	<node name="motor_controller_spawner" pkg="dynamixel_controllers" type="controller_spawner.py"
-		args="--manager=dynamixel_controller_manager
-		      --port dxl_tty1
-		        motor_controller"
-		output="screen"/>
-</launch>

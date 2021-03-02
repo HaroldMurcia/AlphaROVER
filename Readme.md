@@ -19,12 +19,16 @@ This repository contents:
 |--README.md     		  / Instructions to configure the AlphaROVER
 |--src         			  / scripts for the system
 	  |--APPS
-	  |--Arduinio_gps+imu
 	  |--Arm            / Based on: https://github.com/FRC4564/Maestro/
 	  |--Config
-	  |--Control
 	  |--EKF
 	  |--GPIO
+	  |--Cam_Shutter
+	  |--Command_Center
+	  |--Dynamixel_Move
+	  |--Lea_6h_GPS
+	  |--Speed_Control
+	  |--UM7_node
 |--data
 	|--mechanics  
 		|--alpha_full.pdf
@@ -110,25 +114,36 @@ $ source ~/.bashrc
 	`sudo apt-get install ros-melodic-freenect-launch`
 - Install the MTi USB Serial Driver
   ```
+  $ cd $path_alpha_config
   $ git clone https://github.com/xsens/xsens_mt.git
   $ cd ~/xsens_mt
   $ make
   $ sudo modprobe usbserial
   $ sudo insmod ./xsens_mt.ko
   ```
+<!--- 
 - Install gps_common or gps_umd as available based on the ROS distributable
   `sudo apt-get install ros-melodic-gps-umd` or `sudo apt-get install ros-melodic-gps-common`
-- Isntall MTi rosnode
-    ```
+--->
+- Install MTi rosnode
+  ```
   $ cd ~/catkin_ws/src
-  $ git clone https://github.com/HaroldMurcia/xsens_mti_ros_node.git
+  $ git clone https://github.com/ethz-asl/ethzasl_xsens_driver.git
   $ cd ~/catkin_ws/
   $ catkin_make
-    ```
-- Install Dynamixel rosnode
+  ```
+<!---
+write the next lines every time before call node.
+sudo modprobe usbserial
+sudo insmod $path_alpha_config$"/xsens_mt/xsens_mt.ko"
+--->
+- Install [Dynamixel rosnode](https://emanual.robotis.com/docs/en/software/dynamixel/dynamixel_workbench/#ros-tutorials)
     ```
   $ cd ~/catkin_ws/src
-  $ git clone https://github.com/HaroldMurcia/dynamixel_motor.git
+  $ mkdir dynamixel_node
+  $ git clone https://github.com/ROBOTIS-GIT/dynamixel-workbench.git
+  $ git clone https://github.com/ROBOTIS-GIT/dynamixel-workbench-msgs.git
+  $ git clone https://github.com/ROBOTIS-GIT/DynamixelSDK.git
   $ cd ~/catkin_ws/
   $ catkin_make
     ```
@@ -167,7 +182,6 @@ $ source ~/.bashrc
   $ cd ~/catkin_ws/
   $ catkin_make
     ```
-
 
 ## Installing AlphaROVER repository
 ```
@@ -233,11 +247,31 @@ function webcam
 	python ~/cam_bridge.py
 }
 ```
+## Launch of applications
 
+### 3D scan routine
+To launch correctly the scan algorithm, there are some minimum nodes required before to launch, all of them are properly launched using the function bellow.
+```
+$ scan_mode
+```
+Once all nodes are correctly work the '3D scan routine' can be executed with:
+```
+$ python scan3d.py" -o [output_file] -<options> [arguments]
+```
+Where *<output_file>* should be replaced by the name of the desired rosbag file. The options and its respectively arguments are presented y the table below.
 
+| Options | Arguments | Description |
+| --- | --- | --- |
+| h |  | Give information of all options and arguments. |
+| o | [filename] | Name of orsbag where the topics will be save. |
+| q |  | Do not show message information while execution. |
+| a |  | Save all currents topics, if is not selected save the topics of the minimum nodes. |
+| s | [from] [to] [step] | Select the sweep scan mode. |
+| f | [angle] | Select the fixed scan mode. |
 
 ## Authors:
 **[Universidad de Ibagué - Ingeniería Electrónica.](https://electronica.unibague.edu.co)**
+- [Sebastian Tilaguy](mailto:sebastian.tilaguy@gmail.com)
 - [Nickson E. GARCIA](mailto:nicksongarcia@ieee.org)
 - [Cristian G. MOLINA](mailto:2420132009@estudiantesunibague.edu.co)
 - [Harold F. MURCIA](www.haroldmurcia.com)
@@ -251,3 +285,4 @@ function webcam
 [ind]: <http://wiki.ros.org/indigo/Installation/Ubuntu>
 [ind-j]: <http://wiki.ros.org/indigo/Installation/UbuntuARM>
 [ham]: <https://medium.com/@KyleARector/logmein-hamachi-on-raspberry-pi-ad2ba3619f3a>
+[um7]: <https://pypi.org/project/um7py/>
