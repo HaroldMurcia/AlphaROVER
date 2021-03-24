@@ -39,11 +39,9 @@ hokuyo_ip="192.168.0.10"
 DIR=$path_alpha_config$'/xsens_mt'
 if [ -d "$DIR" ]; then
   ### Take action if $DIR exists ###
-  cd ~/catkin_ws
-  catkin_make
-  sleep 10
+  sleep 1
   cd
-  echo "mti config done!"
+  echo "MTI configuration is alredy done!"
 else
   cd $path_alpha_config
   git clone https://github.com/xsens/xsens_mt.git
@@ -125,8 +123,9 @@ function xsens_node {
 	sleep 1
 	sudo chmod -R 777 /dev/tty_imu
 	ls -l /dev/tty_imu
-	roslaunch xsens_driver xsens.launch  &
-	printf $"Xsens MTi-10 ready...\n"
+	roslaunch xsens_driver xsens_driver.launch device:=/dev/tty_imu initial_wait:=3 &
+	sleep 20
+	printf $"Xsens MTi-100 ready...\n"
 }
 
 function kinect_node {
@@ -138,15 +137,17 @@ function kinect_node {
 
 function webcam {
 	echo "======================================="
-  roslaunch usb_cam usb_cam-test.launch &
+	roslaunch usb_cam usb_cam-test.launch &
 	sleep 5
 	printf $"Main camera ready...\n"
 }
 
 function roboclaw_node {
 	echo "======================================="
+	roslaunch speed_control speed_control.launch &
+	sleep 3
 	ls -l /dev/tty_roboclaw
-	roslaunch roboclaw_node roboclaw.launch &
+	roslaunch roboclaw_node roboclaw.launch dev:=/dev/tty_roboclaw &
 	sleep 3
 	printf "Roboclaw ready...\n"
 }
@@ -154,7 +155,7 @@ function roboclaw_node {
 function arm_node {
 	echo "======================================="
 	python $path_alphaROVER$"/src/Arm/arm.py" &
-	sleep 3
+	sleep 1
 	printf "Arm ready...\n"
 }
 
@@ -178,14 +179,17 @@ function pilot {
 	sudo chmod a+rw /dev/input/js0			# permission options (all) + (read)(write)
 	rosparam set joy_node/dev "/dev/input/js0"	# ROS parameter assignment
 	rosrun joy joy_node &				# Run Joy_node
+	sleep 1
+	roslaunch command_center command_center.launch &
+	sleep 3
 	printf "Joy is ready...\n"
 }
 
 function USB {
 	echo "======================================="
 	ls -l /dev/sda1
-	sudo mount -t vfat /dev/sda1 /media/usb/ -o uid=1000,gid=1000
-	cd /media/usb
+	sudo mount -t vfat /dev/sda1 /media/usb/ -o uid=1000, gid=1000
+	ls -l /media/usb
 	printf "USB is ready...\n"
 }
 
@@ -211,7 +215,7 @@ function um7_node {
         echo "======================================="
 	chmod +x $path_alphaROVER$"/src/um7_node/src/um7_node.py"
 	ls -l /dev/tty_um7
-	roslaunch um7_node um7_node.launch device_name:=/dev/tty_GPS &
+	roslaunch um7_node um7_node.launch device_name:=/dev/tty_um7 &
 	sleep 3
 	printf "UM7 imu is ready...\n"
 }
@@ -225,18 +229,38 @@ function Alpha_update {
         git clone https://github.com/Tilaguy/AlphaROVER.git
 }
 
+function scan_mode {
+	echo "======================================="
+	echo "Scan function is beginning"
+	USB
+	sleep 1
+	um7_node
+	sleep 3
+	urg_node
+	sleep 3
+	dynamixel_node
+	sleep 4
+#	kinect_node
+#	sleep 10
+	cd $path_alphaROVER$"/src/Apps/"
+	echo "======================================="
+}
+
 function rover {
-	printf "\n======================================="
+	echo "======================================="
 	roscore &
 	sleep 4
 	pilot &
 	sleep 2
 	xsens_node &
 	sleep 5
+	gps_node
+	sleep 3
 	roboclaw_node &
 	sleep 3
 	ekf_node &
+	clear
 	sleep 7
-	printf $"ROVER READY\n"
-	printf "=======================================\n"
+	echo "ROVER READY"
+	echo "======================================="
 }
