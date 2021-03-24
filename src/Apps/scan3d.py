@@ -33,12 +33,12 @@ w_max = np.pi/90.0
 flag_print = False
 bagname = ""
 bag_node = ""
-topics_list = ['/gps/odom','/gps/data','/gps/str'
+topics_list = ['/gps/odom','/gps/data','/gps/str',
                '/um7',
                '/cam_time',
-               '/ekf','/odom_alpha','/ekf2','/velocity',
+               '/ekf/Odom','/odom_alpha','/velocity',
                '/UL','/UR','/WL','/WL_ref','/WR','/WR_ref','/ctrl_flag',
-               '/enc_L','/enc_R',
+               '/ekf/Vl','/ekf/Vr',
                '/iL','/iR','/voltage',
                '/diagnostics','/diagnostics_agg','/diagnostics_toplevel_state',
                '/echoes',
